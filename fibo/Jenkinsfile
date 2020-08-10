@@ -98,7 +98,7 @@ node {
             BRANCH = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 1 ; else echo "${BRANCH_NAME}" ; fi').trim().toLowerCase()
             TAG    = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 2 ; else echo "latest" ; fi').trim()
           }
-          withCredentials([string(credentialsId: "apiKey_${env.ONTPUB_SPEC_HOST}_${env.ONTPUB_FAMILY}_ontology_${BRANCH}_${TAG}", variable: 'API_KEY')]) {
+          withCredentials([string(credentialsId: "apiKey_${env.ONTPUB_SPEC_HOST}_${env.ONTPUB_FAMILY}_ontology", variable: 'API_KEY')]) {
             def ontologyUpdate = """
                 {"apiKey": "${API_KEY}"}
             """
