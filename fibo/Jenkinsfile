@@ -102,9 +102,9 @@ node {
             def ontologyUpdate = """
                 {"apiKey": "${API_KEY}"}
             """
-            def response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: ontologyUpdate, url: "https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}"
+            def response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: ontologyUpdate, url: "https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}/update/ontology"
             def json = new JsonSlurper().parseText(response.content)
-            echo "Start \"https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}\" update (${response.status}):\n id:\t\t${json.id}\n status:\t\t${json.status}\n msg:\t${json.msg}\n startTimestamp:\t${json.startTimestamp}"
+            echo "Start \"https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}\" update (${response.status}):\n id:\t\t\t${json.id}\n status:\t\t${json.status}\n msg:\t\t\t${json.msg}\n startTimestamp:\t${json.startTimestamp}"
           }
           // slackScript.notifyStage()
         }
