@@ -98,18 +98,14 @@ node {
             BRANCH = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 1 ; else echo "${BRANCH_NAME}" ; fi').trim().toLowerCase()
             TAG    = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 2 ; else echo "latest" ; fi').trim()
           }
-          withCredentials([[ $class: 'StringBinding', credentialsId: "apiKey_${env.ONTPUB_SPEC_HOST}_${env.ONTPUB_FAMILY}_ontology_${BRANCH}_${TAG}", variable: 'API_KEY']]) {
+          withCredentials([string(credentialsId: "apiKey_${env.ONTPUB_SPEC_HOST}_${env.ONTPUB_FAMILY}_ontology_${BRANCH}_${TAG}", variable: 'API_KEY')]) {
             def ontologyUpdate = """
                 {"apiKey": "${API_KEY}"}
             """
-            def response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: ontologyUpdate, url: "https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}"
-            def json = new JsonSlurper().parseText(response.content)
-            echo "Start \"https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}\" update (${response.status}):"
-            echo " id:             ${json.id}"
-            echo " status:         ${json.status}"
-            echo " msg:            ${json.msg}"
-            echo " startTimestamp: ${json.startTimestamp}"
           }
+          def response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: ontologyUpdate, url: "https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}"
+          def json = new JsonSlurper().parseText(response.content)
+          echo "Start \"https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}\" update (${response.status}):\n id:\t\t${json.id}\n status:\t\t${json.status}\n msg:\t${json.msg}\n startTimestamp:\t${json.startTimestamp}"
           // slackScript.notifyStage()
         }
       } // end of node('master')
