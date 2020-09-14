@@ -10,8 +10,6 @@
 // Jenkins requirements:
 //	* "pipeline-npm" plugin + "fibo" Npm config file
 
-import groovy.json.JsonSlurper
-
 env.ONTPUB_FAMILY='fibo'
 env.ONTPUB_SPEC_HOST='spec.edmcouncil.org'
 env.ONTPUB_IS_DARK_MODE='1'
@@ -93,18 +91,6 @@ node {
           deleteDir()
           dir("${workspace}@tmp") {
             deleteDir()
-          }
-          script {
-            BRANCH = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 1 ; else echo "${BRANCH_NAME}" ; fi').trim().toLowerCase()
-            TAG    = sh(returnStdout: true, script: 'if [ -n "${TAG_NAME}" ] ; then echo "${TAG_NAME}" | cut -d_ -f 2 ; else echo "latest" ; fi').trim()
-          }
-          withCredentials([string(credentialsId: "apiKey_${env.ONTPUB_SPEC_HOST}_${env.ONTPUB_FAMILY}_ontology", variable: 'API_KEY')]) {
-            def ontologyUpdate = """
-                {"apiKey": "${API_KEY}"}
-            """
-            def response = httpRequest acceptType: 'APPLICATION_JSON', contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: ontologyUpdate, url: "https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}/update/ontology"
-            def json = new JsonSlurper().parseText(response.content)
-            echo "Start \"https://${env.ONTPUB_SPEC_HOST}/${env.ONTPUB_FAMILY}/ontology/${BRANCH}/${TAG}\" update (${response.status}):\n id:\t\t\t${json.id}\n status:\t\t${json.status}\n msg:\t\t\t${json.msg}\n startTimestamp:\t${json.startTimestamp}"
           }
           // slackScript.notifyStage()
         }
